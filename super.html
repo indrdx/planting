@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zone Maanpur Planting Report</title>
+  <style>
+    body {
+      background: #eef2f7;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin:0;
+    }
+    .container {
+      max-width: 700px;
+      background: #fff;
+      margin:45px auto 45px;
+      border-radius:14px;
+      box-shadow: 0 5px 30px #0002;
+      overflow:hidden;
+      border:1px solid #dde;
+    }
+    .report-header {
+      padding:25px 30px 15px 30px;
+      background: linear-gradient(90deg, #13798a 60%, #52cdef 100%);
+      color:#fff;
+      text-align:left;
+      border-bottom:4px solid #52cdef;
+      box-shadow:0 2px 10px #52cdef33;
+    }
+    .report-header h1 {
+      margin-bottom:2px;
+      margin-top:0;
+      font-weight:600;
+      font-size:2em
+    }
+    .report-header .company { font-size:1.12em; letter-spacing:0.03em; font-weight:500; }
+    .report-header .zone { font-size:1em; font-weight:bold;}
+    .report-header .circle-by {
+      margin-top:7px; font-size:1em; font-weight:400; letter-spacing:0.03em;
+    }
+    .form-area {
+      padding: 24px 30px 12px 30px;
+    }
+    label { display:block; margin-top:19px; font-weight:520; color:#26717d }
+    input, select {
+      width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #b4d8e3;
+      font-size:1.03em; transition:.2s; background:#f8fbfc;
+    }
+    input:focus,select:focus{ border:1.2px solid #52cdef; background:#f4fcff}
+    .row { display:flex; gap:14px; }
+    .row > div { flex:1; }
+    button {
+      margin-top: 22px; padding: 12px; border: none; border-radius: 4px; 
+      background: #009879; color: #fff; font-size: 16px; cursor: pointer;
+    }
+    .view-data {
+      background:#f9fdff; padding:0 30px 0 30px;
+      min-height:340px;
+    }
+    .data-card {
+      background:#fff;
+      border-radius:8px;
+      margin:25px auto 0;
+      min-height:300px;
+      padding:30px 22px 18px;
+      box-shadow:0 2px 16px #0a638912;
+      max-width:480px;
+      border: 1.2px solid #b4d8e3;
+    }
+    .data-card h2 {
+      margin:0 0 14px 0; text-align:center; font-weight:600; color:#167890;
+      font-size:1.35em; letter-spacing:.02em;
+    }
+    .summary-table {
+      width:100%; border-collapse: collapse; margin-top:13px; font-size:1.09em;
+    }
+    .summary-table td{padding:8px 7px; border:1px solid #bbe6f6;}
+    .summary-table tr:nth-child(even){background:#f3fafd;}
+    .option-btns {text-align:center; margin:20px 0 10px 0;}
+    .print { background: #395bdb; margin-right: 10px; }
+    .whatsapp { background: #25d366; margin-right: 10px;}
+    .imgdl { background: #fba600; }
+    .backbtn {background:#fa4361; margin-right:10px;}
+    .print-meta { text-align:center; font-size:15px; margin-bottom:8px; color: #395bdb;}
+    .footer {
+      padding:15px 30px; background: linear-gradient(90deg, #d7f2fd 60%, #aee5f5 100%);
+      font-size:1.05em; color:#005b6b; letter-spacing:0.03em;
+      border-top:2.5px solid #b0e7f7;
+      text-align:center;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    .footer .ft-title {font-weight:600;}
+    .footer .ft-small {font-size:0.97em;}
+    .footer .ft-email {color:#076486; word-break:break-all;}
+    .data-datetime {
+      text-align:center; margin-top:15px; font-size:0.9em; color:#029688; 
+      letter-spacing:.04em; font-weight:500;
+    }
+    .view-mode .footer { display: none !important; }
+    @media print {
+      .print, .whatsapp, .imgdl, .option-btns, .report-header, .backbtn { display: none !important;}
+      .container {box-shadow:none; border:none;}
+      body { background: #fff !important; }
+      .footer { display: none !important; }
+    }
+    .hide-for-image { display: block; }
+    .image-capture .hide-for-image { display: none !important; }
+    .image-capture .footer { display: none !important; }
+    .image-capture .backbtn { display: none !important;}
+    /* Responsive Styles */
+    @media (max-width: 900px) {
+      .container { max-width: 95%; }
+    }
+    @media (max-width: 600px) {
+      .container { max-width: 100%; margin:12px; border-radius:10px; }
+      .report-header, .form-area, .view-data, .footer {padding:14px;}
+      .data-card {padding:19px 5px 12px;}
+      h1{ font-size:1.25em;}
+      label {margin-top:13px; font-size:1em;}
+      input,select{padding:7px;}
+      .row { flex-direction:column; gap:6px;}
+      button{padding:11px;font-size:15px;}
+    }
+    @media (max-width: 400px) {
+      .container {margin:3px;}
+      body{font-size:15px;}
+      .summary-table td {padding:5px 2px;}
+    }
+    @media (min-width: 600px) and (max-width:850px){
+      .container {max-width: 97%; }
+      .data-card{max-width:90vw;}
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <div class="report-header">
+    <div class="company">Triveni Engineering & Industries Ltd.</div>
+    <h1>Zone Maanpur Planting Report</h1>
+    <div class="zone">Zone: Maanpur</div>
+    <div class="circle-by">Circle By: <b id="circleHeader">-</b></div>
+  </div>
+  <div class="form-area" id="formSection">
+      <form id="maanpurForm" autocomplete="off">
+        <label>Circle:
+          <select name="circle" id="circleSelect" required>
+            <option value="">Select Circle</option>
+            <option value="BIZARKHATA">BIZARKHATA</option>
+            <option value="NANKAR RANI">NANKAR RANI</option>
+            <option value="BHOOBRA">BHOOBRA</option>
+            <option value="RAHMATGANJ">RAHMATGANJ</option>
+            <option value="LOHRA">LOHRA</option>
+          </select>
+        </label>
+        <label>Supervisor: <input type="text" id="supervisor" readonly /></label>
+        <label>Phone No: <input type="text" id="phone" readonly /></label>
+        <label>Target: <input type="number" id="target" readonly /></label>
+        <div class="row">
+          <div>
+            <label>Ondate Planting Area
+              <input type="number" id="ondateArea" min="0" />
+            </label>
+          </div>
+          <div>
+            <label>Ondate Planting Plot
+              <input type="number" id="ondatePlot" min="0" />
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Todate Planting Area
+              <input type="number" id="todateArea" min="0" />
+            </label>
+          </div>
+          <div>
+            <label>Todate Planting Plot
+              <input type="number" id="todatePlot" min="0" />
+            </label>
+          </div>
+        </div>
+        <button type="button" onclick="viewData()">Submit & View</button>
+      </form>
+  </div>
+  <div class="view-data" id="viewDataDiv">
+    <div class="option-btns hide-for-image">
+      <button class="backbtn" onclick="goHome()">Back to Home</button>
+      <button class="print" onclick="printView()">Print</button>
+      <button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
+      <button class="imgdl" onclick="downloadImg()">Download Image</button>
+    </div>
+    <div class="data-card" id="dataCard">
+      <div id="printMeta" class="print-meta" style="display:none"></div>
+      <div id="dataSummary"><!-- filled by JS --></div>
+      <div class="data-datetime" id="dataDateTime"></div>
+    </div>
+  </div>
+  <div class="footer" id="mainFooter">
+      <div class="ft-title">ind-rdx creater: Sanjeet Singh Chauhan</div>
+      <div class="ft-small">Phone: 7404428336 | Email: <span class="ft-email">sanjeetsinghchauhan.378@gmail.com</span></div>
+      <div class="ft-small">Address: VOP Peepli Nayak Tanda, Rampur 244925 | Since 2017–2025</div>
+      <div class="ft-small">© Copyright</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const data = {
+  "BIZARKHATA": { supervisor: "SANJEET SINGH", phone: "7404428336", target: 110 },
+  "NANKAR RANI": { supervisor: "ANKUR POSWAL", phone: "9756749090", target: 130 },
+  "BHOOBRA": { supervisor: "UTTAM KUMAR", phone: "7457047420", target: 230 },
+  "RAHMATGANJ": { supervisor: "PRAMOD YADAV", phone: "7905037366", target: 220 },
+  "LOHRA": { supervisor: "ADITYA KUMAR", phone: "7900320726", target: 310 }
+};
+
+document.getElementById('circleSelect').addEventListener('change', function(){
+    const v = this.value;
+    document.getElementById('circleHeader').textContent = v || "-";
+    if(v && data[v]){
+      document.getElementById('supervisor').value = data[v].supervisor;
+      document.getElementById('phone').value = data[v].phone;
+      document.getElementById('target').value = data[v].target;
+    }else{
+      document.getElementById('supervisor').value = "";
+      document.getElementById('phone').value = "";
+      document.getElementById('target').value = "";
+    }
+});
+
+function viewData() {
+  const circle = document.getElementById('circleSelect').value;
+  if (!circle) { alert("Please select Circle!"); return;}
+  
+  const supv = data[circle].supervisor;
+  const phone = data[circle].phone;
+  const target = data[circle].target;
+  const ondateArea = document.getElementById('ondateArea').value || "-";
+  const ondatePlot = document.getElementById('ondatePlot').value || "-";
+  const todateArea = document.getElementById('todateArea').value || "-";
+  const todatePlot = document.getElementById('todatePlot').value || "-";
+  let percentage = (todateArea && target) ? ((Number(todateArea)/target)*100).toFixed(2) : "0.00";
+  
+  // Auto date & time for data view
+  const now = new Date();
+  const currentDate = now.toLocaleDateString('en-IN');
+  const currentTime = now.toLocaleTimeString('en-IN');
+
+  document.getElementById('dataDateTime').textContent = "Generated on: " + currentDate + " at " + currentTime;
+  
+  const summaryHTML = `
+    <h2>Planting Data Summary</h2>
+    <table class="summary-table">
+      <tr><td><b>Circle</b></td><td>${circle}</td></tr>
+      <tr><td><b>Supervisor</b></td><td>${supv}</td></tr>
+      <tr><td><b>Phone No.</b></td><td>${phone}</td></tr>
+      <tr><td><b>Target</b></td><td>${target}</td></tr>
+      <tr><td><b>Ondate Planting Area</b></td><td>${ondateArea}</td></tr>
+      <tr><td><b>Ondate Planting Plot</b></td><td>${ondatePlot}</td></tr>
+      <tr><td><b>Todate Planting Area</b></td><td>${todateArea}</td></tr>
+      <tr><td><b>Todate Planting Plot</b></td><td>${todatePlot}</td></tr>
+      <tr><td><b>Percentage Planting</b></td><td>${percentage} %</td></tr>
+    </table>
+  `;
+  document.getElementById('dataSummary').innerHTML = summaryHTML;
+  document.getElementById('viewDataDiv').style.display = "block";
+  document.getElementById('formSection').style.display = "none";
+  
+  document.getElementById('mainContainer').classList.add('view-mode');
+  
+  window.savedSummaryForWA = 
+    `Zone Maanpur - Planting Report\n\n` +
+    `Circle: ${circle}\n` +
+    `Supervisor: ${supv}\n` +
+    `Phone: ${phone}\n` +
+    `Target: ${target}\n` +
+    `Generated: ${currentDate} at ${currentTime}\n` +
+    `Ondate Planting Area: ${ondateArea}\n` +
+    `Ondate Planting Plot: ${ondatePlot}\n` +
+    `Todate Planting Area: ${todateArea}\n` +
+    `Todate Planting Plot: ${todatePlot}\n` +
+    `Percentage Planting: ${percentage} %`;
+  document.getElementById('printMeta').style.display = "none";
+}
+
+function goHome(){
+  document.getElementById('viewDataDiv').style.display = "none";
+  document.getElementById('formSection').style.display = "block";
+  document.getElementById('mainContainer').classList.remove('view-mode');
+}
+
+function printView(){
+  var now = new Date();
+  var printDateTime = now.toLocaleDateString('en-IN') + " " + now.toLocaleTimeString('en-IN');
+  document.getElementById('printMeta').innerHTML = "<b>Printed On:</b> " + printDateTime;
+  document.getElementById('printMeta').style.display = "block";
+  
+  setTimeout(function() {
+    window.print();
+    document.getElementById('printMeta').style.display = "none";
+  }, 50);
+}
+
+function shareWhatsApp(){
+  if(!window.savedSummaryForWA) return;
+  let msg = encodeURIComponent(window.savedSummaryForWA);
+  let url = "https://wa.me/?text=" + msg;
+  window.open(url, "_blank");
+}
+
+function downloadImg(){
+  const viewDiv = document.getElementById('viewDataDiv');
+  viewDiv.classList.add('image-capture');
+  html2canvas(viewDiv, {
+    backgroundColor: '#fcfdff',
+    scale: 2,
+    useCORS: true
+  }).then(canvas=>{
+    viewDiv.classList.remove('image-capture');
+    let link = document.createElement('a');
+    link.download = 'zone_maanpur_report.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }).catch(error => {
+    viewDiv.classList.remove('image-capture');
+    console.error('Error generating image:', error);
+    alert('Error generating image. Please try again.');
+  });
+}
+</script>
+</body>
+</html>
