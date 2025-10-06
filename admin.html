@@ -8,12 +8,7 @@
     body { background: #eef2f7; font-family: 'Segoe UI', Arial, sans-serif; margin:0;}
     .container { max-width:1100px; margin:30px auto; background:#fff; border-radius:14px; box-shadow:0 5px 22px #0002; border:1px solid #dde; padding:18px 10px 18px 10px;}
     h1 {text-align:center; color:#0581a6; margin-bottom:22px;}
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px 16px;
-      margin-bottom: 10px;
-    }
+    .form-grid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 16px; margin-bottom: 10px;}
     .form-grid > div { min-width: 160px;}
     label {font-weight:525; margin-top:4px; color:#26717d; font-size:1em;}
     input, select {
@@ -28,16 +23,18 @@
     .final-btn {background:#319c4a; margin-left:9px;}
     .reset-btn {background:#fd4545; margin-left:10px;}
     .edit-btn {background:#d86d16; font-size:0.96em; padding:5px 11px;}
-    .preview-table {margin-top:13px;margin-bottom:18px;}
+    .preview-table {margin-top:13px;margin-bottom:20px;}
     .responsive-table {overflow-x:auto; margin-top:30px;}
     table {width:100%; border-collapse:collapse; min-width:900px; background:#f9fdff; margin-top:14px;}
     th, td {text-align:center; padding:8px 5px; border:1px solid #cbe5fc; font-size:1em;}
     th {background:#0a899d; color:#fff;}
     tr:nth-child(even){background-color:#f3fafd;}
     .total-row { background:#e9f9df; font-weight:600;}
-    @media (max-width:980px){
-      .form-grid{grid-template-columns:repeat(2,1fr);}
-    }
+    .final-actions {margin-bottom:18px; text-align:center;}
+    .print-btn { background:#395bdb; margin-right:10px;}
+    .img-btn {background:#fba600; margin-right:10px;}
+    .wa-btn {background:#25d366;}
+    @media (max-width:980px){.form-grid{grid-template-columns:repeat(2,1fr);}}
     @media (max-width:700px){
       .container{max-width:99%; padding:4px;}
       th,td{font-size:0.92em;padding:6px 3px;}
@@ -46,27 +43,9 @@
     }
     @media (max-width:500px){
       th,td{font-size:0.87em; padding:4px 2px;} h1{font-size:1.11em;} table{min-width:580px;}
+      .final-actions button {font-size:0.95em; padding:9px;}
     }
-    .login-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      width: 100%;
-      max-width: 300px;
-    }
-    .login-btn {
-      padding: 15px 25px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.15em;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-      letter-spacing: 0.02em;
-    }
+    .img-capture .final-actions {display:none !important;}
   </style>
 </head>
 <body>
@@ -114,13 +93,20 @@
         <button class="add-btn" type="submit" id="addBtn">Add Circle</button>
         <button class="final-btn" type="button" onclick="showTable()" id="finalBtn" disabled>Final Submit & View</button>
         <button class="reset-btn" type="button" onclick="resetAll()">Reset All</button>
-        <a href="index.html" class="login-btn admin-login">
-         Home Page
       </div>
     </form>
     <div class="preview-table" id="previewTable"></div>
-    <div class="responsive-table" id="tableView" style="display:none;"></div>
+    <div class="responsive-table" id="tableView" style="display:none;">
+      <div class="final-actions" id="finalActions">
+        <button class="print-btn" onclick="printTable()">Print</button>
+        <button class="img-btn" onclick="downloadTableImg()">Download Image</button>
+        <button class="wa-btn" onclick="shareWhatsApp()">Share WhatsApp</button>
+      </div>
+      <div id="zoneDataWrap"></div>
+    </div>
   </div>
+<!-- html2canvas CDN -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 var circleMaster = {
     "BIZARKHATA": 110,
@@ -216,9 +202,10 @@ window.editRow = function(index){
   document.getElementById('addBtn').disabled = false;
 };
 
+// Show & Render Table
 window.showTable = function() {
   let totalArea = 0, totalPlot = 0, totalTArea = 0, totalTPlot = 0, totalTarget = 0;
-  let table = `<table><tr>
+  let table = `<table id="zoneTable"><tr>
     <th>Circle</th>
     <th>Target</th>
     <th>Ondate Area (ha)</th>
@@ -254,16 +241,63 @@ window.showTable = function() {
     <td>${totalPercent} %</td>
   </tr>`;
   table += `</table>`;
-  document.getElementById('tableView').innerHTML = table;
+  document.getElementById('zoneDataWrap').innerHTML = table;
   document.getElementById('tableView').style.display = "block";
   document.getElementById('multiCircleForm').style.display = "none";
   document.getElementById('previewTable').style.display = "none";
 };
 
+function printTable(){
+  let printContents = `<h2 style='text-align:center;color:#0581a6;'>Zone Maanpur - All Circle Data</h2>` +
+    document.getElementById('zoneDataWrap').innerHTML;
+  let originalContent = document.body.innerHTML;
+  document.body.innerHTML = printContents;
+  window.print();
+  document.body.innerHTML = originalContent;
+  window.location.reload();
+}
+
+// WhatsApp share
+function shareWhatsApp(){
+  let rows = list.map(row =>
+    `Circle: ${row.circle} | Target: ${row.target} | Ondate Area: ${row.ondateArea} ha | Ondate Plot: ${row.ondatePlot} | Todate Area: ${row.todateArea} ha | Todate Plot: ${row.todatePlot} | %: ${row.percent}`
+  );
+  let totalArea = list.reduce((s, r) => s + r.ondateArea, 0);
+  let totalPlot = list.reduce((s, r) => s + r.ondatePlot, 0);
+  let totalTArea = list.reduce((s, r) => s + r.todateArea, 0);
+  let totalTPlot = list.reduce((s, r) => s + r.todatePlot, 0);
+  let totalTarget = list.reduce((s, r) => s + r.target, 0);
+  let totalPercent = totalTarget===0 ? "0.00" : ((totalTArea / totalTarget)*100).toFixed(2);
+  let msg =
+    "Zone Maanpur - All Circle Planting Data\n\n" +
+    rows.join("\n") +
+    `\nTotal Zone: Target=${totalTarget}, Ondate Area=${totalArea.toFixed(2)} ha, Ondate Plot=${totalPlot}, Todate Area=${totalTArea.toFixed(2)} ha, Todate Plot=${totalTPlot} | %=${totalPercent}`;
+  let url = "https://wa.me/?text=" + encodeURIComponent(msg);
+  window.open(url, "_blank");
+}
+
+// Download as image
+function downloadTableImg(){
+  const wrap = document.getElementById('tableView');
+  wrap.classList.add('img-capture');
+  html2canvas(wrap, {
+    backgroundColor: '#eef2f7',
+    scale: 2
+  }).then(canvas=>{
+    wrap.classList.remove('img-capture');
+    let link = document.createElement('a');
+    link.download = 'zone_maanpur_report.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }).catch(error => {
+    wrap.classList.remove('img-capture');
+    alert('Image download issue');
+  });
+}
+
 window.resetAll = function() {
   list = [];
   editIndex = null;
-  document.getElementById('tableView').innerHTML = "";
   document.getElementById('tableView').style.display = "none";
   document.getElementById('multiCircleForm').style.display = "block";
   document.getElementById('finalBtn').disabled = true;
